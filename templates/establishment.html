@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-TW">
+
+
+  <head>
+
+
+    <meta charset="utf-8">
+
+
+    <title>{{ establishment.name }} - Posts</title>
+
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+  </head>
+
+
+  <body>
+
+
+    <!-- ========== NAVBAR ========== -->
+
+
+    <nav class="navbar">
+
+
+      <a href="{{ url_for('home') }}" class="logo">ccu.never</a>
+
+
+      <div class="nav-links">
+
+
+        {% if session['user_id'] %}
+
+
+          <span>您好, {{ session['username'] }}</span>
+
+
+          <a href="{{ url_for('logout') }}">登出</a>
+
+
+        {% else %}
+
+
+          <a href="{{ url_for('login') }}">登入</a>
+
+
+          <a href="{{ url_for('register') }}">註冊</a>
+
+
+        {% endif %}
+
+
+      </div>
+
+
+    </nav>
+
+
+
+
+
+    <!-- Floating Create Post Button -->
+
+
+    <button id="create-post-btn" class="floating-button" aria-label="新增貼文">
+
+
+      <i class="fas fa-plus"></i>
+
+
+    </button>
+
+
+
+
+
+    <div class="establishment-container">
+
+
+      <div class="establishment-header">
+
+
+        <h1>{{ establishment.name }}</h1>
+
+
+        
+
+
+        <!-- Search Posts -->
+
+
+        <div class="post-search">
+
+
+          <form action="{{ url_for('show_establishment', est_id=establishment.id) }}" method="GET">
+
+
+            <input type="text" name="search" placeholder="搜尋貼文..." value="{{ search_query }}">
+
+
+            <button type="submit"><i class="fas fa-search"></i></button>
+
+
+          </form>
+
+
+        </div>
+
+
+      </div>
+
+
+
+
+
+      <!-- Posts Section -->
+
+
+      <div class="posts-container">
+
+
+        {% if posts %}
+
+
+          <div class="posts-list">
+
+
+            {% for post in posts %}
+
+
+              <div class="post-card" data-post-id="{{ post.id }}">
+
+
+                <div class="post-meta-info">
+
+
+                  <div class="post-rating">
+
+
+                    <i class="fas fa-star"></i> <span>{{ post.rating }}</span>
+
+
+                  </div>
+
+
+                  <div class="post-time">{{ post.time_since }}</div>
+
+
+                </div>
+
+
+                <h3 class="post-title">{% if post.title %}{{ post.title }}{% else %}Post #{{ post.id }}{% endif %}</h3>
+
+
+                <div class="post-preview">
+
+
+                  <p>{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+
+
+                </div>
+
+
+                <div class="post-stats">
+
+
+                  <div class="post-likes">
+
+
+                    <i class="fas fa-heart"></i> <span>{{ post.likes }}</span>
+
+
+                  </div>
+
+
+                  <div class="post-comments">
+
+
+                    <i class="fas fa-comment"></i> <span>{{ post.comment_count }}</span>
+
+
+                  </div>
+
+
+                </div>
+
+
+              </div>
+
+
+            {% endfor %}
+
+
+          </div>
+
+
+        {% else %}
+
+
+          <div class="no-posts">
+
+
+            <p>目前沒有關於此店家的評論。成為第一個分享體驗的人！</p>
+
+
+          </div>
+
+
+        {% endif %}
+
+
+      </div>
+
+
+
+
+
+      <div class="back-link">
+
+
+        <a href="{{ url_for('list_establishments') }}" class="btn-back">← 返回店家列表</a>
+
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- Create Post Modal -->
+
+
+    <div id="post-modal" class="modal">
+
+
+      <div class="modal-content">
+
+
+        <span class="close-modal">&times;</span>
+
+
+        <h2>分享您的體驗</h2>
+
+
+        
+
+
+        <form id="post-form">
+
+
+          <div class="form-group">
+
+
+            <label for="post-title">標題</label>
+
+
+            <input type="text" id="post-title" placeholder="為您的貼文添加標題...">
+
+
+          </div>
+
+
+          
+
+
+          <div class="form-group">
+
+
+            <label>評分</label>
+
+
+            <div class="star-rating">
+
+
+              <div class="stars">
+
+
+                <span class="star" data-value="0.5"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="1"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="1.5"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="2"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="2.5"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="3"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="3.5"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="4"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="4.5"><i class="far fa-star"></i></span>
+
+
+                <span class="star" data-value="5"><i class="far fa-star"></i></span>
+
+
+              </div>
+
+
+              <div class="rating-value">0</div>
+
+
+            </div>
+
+
+          </div>
+
+
+          
+
+
+          <div class="form-group">
+
+
+            <label for="post-content">內容</label>
+
+
+            <textarea id="post-content" placeholder="分享您的想法..."></textarea>
+
+
+          </div>
+
+
+          
+
+
+          <button type="submit" id="submit-post">發佈</button>
+
+
+        </form>
+
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- Login Required Modal -->
+
+
+    <div id="login-required-modal" class="modal">
+
+
+      <div class="modal-content">
+
+
+        <span class="close-modal">&times;</span>
+
+
+        <div class="login-required-message">
+
+
+          <i class="fas fa-lock"></i>
+
+
+          <h2>需要登入</h2>
+
+
+          <p>您必須登入才能發佈內容</p>
+
+
+          <div class="modal-actions">
+
+
+            <a href="{{ url_for('login') }}" class="modal-btn primary">登入</a>
+
+
+            <a href="{{ url_for('register') }}" class="modal-btn secondary">註冊</a>
+
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- ========== FOOTER ========== -->
+
+
+    <footer>
+
+
+      <p>© 2025 ccu.never. All rights reserved.</p>
+
+
+    </footer>
+
+
+
+
+
+    <script>
+
+
+      $(document).ready(function() {
+
+
+        const postModal = $("#post-modal");
+
+
+        const loginModal = $("#login-required-modal");
+
+
+        const createPostBtn = $("#create-post-btn");
+
+
+        const stars = $(".star");
+
+
+        let ratingValue = 0;
+
+
+        let isRatingLocked = false;
+
+
+        
+
+
+        // Open appropriate modal when clicking the create post button
+
+
+        createPostBtn.on("click", function() {
+
+
+          {% if session['user_id'] %}
+
+
+            postModal.addClass("show");
+
+
+          {% else %}
+
+
+            loginModal.addClass("show");
+
+
+          {% endif %}
+
+
+        });
+
+
+        
+
+
+        // Close modals when clicking the close button or outside the modal
+
+
+        $(".close-modal").on("click", function() {
+
+
+          $(this).closest(".modal").removeClass("show");
+
+
+        });
+
+
+        
+
+
+        $(window).on("click", function(event) {
+
+
+          if ($(event.target).hasClass("modal")) {
+
+
+            $(".modal").removeClass("show");
+
+
+          }
+
+
+        });
+
+
+        
+
+
+        // Star rating functionality
+
+
+        function updateStarsUI(value) {
+
+
+          stars.each(function() {
+
+
+            const starValue = parseFloat($(this).data("value"));
+
+
+            const icon = $(this).find("i");
+
+
+            
+
+
+            if (starValue <= value) {
+
+
+              // Full star
+
+
+              if (Math.floor(starValue) === starValue) {
+
+
+                icon.removeClass("far fa-star-half far fa-star").addClass("fas fa-star");
+
+
+              } 
+
+
+              // Half star
+
+
+              else {
+
+
+                if (starValue - 0.5 < value) {
+
+
+                  icon.removeClass("far fa-star fas fa-star").addClass("fas fa-star-half-alt");
+
+
+                }
+
+
+              }
+
+
+            } else {
+
+
+              icon.removeClass("fas fa-star fas fa-star-half-alt").addClass("far fa-star");
+
+
+            }
+
+
+          });
+
+
+          
+
+
+          $(".rating-value").text(value);
+
+
+        }
+
+
+        
+
+
+        // Handle star hover
+
+
+        stars.on("mousemove", function(e) {
+
+
+          if (isRatingLocked) return;
+
+
+          
+
+
+          const star = $(this);
+
+
+          const starValue = parseFloat(star.data("value"));
+
+
+          let value = starValue;
+
+
+          
+
+
+          // If this is a whole star and the mouse is on the left half, use the half star value
+
+
+          if (Math.floor(starValue) === starValue) {
+
+
+            const rect = this.getBoundingClientRect();
+
+
+            const halfWidth = rect.width / 2;
+
+
+            const mouseX = e.clientX - rect.left;
+
+
+            
+
+
+            if (mouseX < halfWidth) {
+
+
+              value = starValue - 0.5;
+
+
+            }
+
+
+          }
+
+
+          
+
+
+          updateStarsUI(value);
+
+
+          ratingValue = value;
+
+
+        });
+
+
+        
+
+
+        // Reset stars when mouse leaves the container (unless locked)
+
+
+        $(".stars").on("mouseleave", function() {
+
+
+          if (!isRatingLocked) {
+
+
+            updateStarsUI(0);
+
+
+            ratingValue = 0;
+
+
+          }
+
+
+        });
+
+
+        
+
+
+        // Lock/unlock rating on click
+
+
+        stars.on("click", function() {
+
+
+          isRatingLocked = !isRatingLocked;
+
+
+          
+
+
+          if (!isRatingLocked) {
+
+
+            updateStarsUI(0);
+
+
+            ratingValue = 0;
+
+
+          }
+
+
+        });
+
+
+        
+
+
+        // Navigate to post detail page when clicking on a post
+
+
+        $(".post-card").on("click", function() {
+
+
+          const postId = $(this).data("post-id");
+
+
+          window.location.href = "/post/" + postId;
+
+
+        });
+
+
+        
+
+
+        // Handle form submission
+
+
+        $("#post-form").on("submit", function(e) {
+
+
+          e.preventDefault();
+
+
+          
+
+
+          const title = $("#post-title").val();
+
+
+          const content = $("#post-content").val();
+
+
+          
+
+
+          if (!content) {
+
+
+            alert("內容不能為空！");
+
+
+            return;
+
+
+          }
+
+
+          
+
+
+          // Send post data via AJAX
+
+
+          $.ajax({
+
+
+            url: "/establishment/{{ establishment.id }}/new_post",
+
+
+            type: "POST",
+
+
+            contentType: "application/json",
+
+
+            data: JSON.stringify({
+
+
+              title: title,
+
+
+              content: content,
+
+
+              rating: ratingValue
+
+
+            }),
+
+
+            success: function(response) {
+
+
+              if (response.status === "success") {
+
+
+                // Close modal and reload page to show the new post
+
+
+                postModal.removeClass("show");
+
+
+                location.reload();
+
+
+              } else {
+
+
+                alert(response.message);
+
+
+              }
+
+
+            },
+
+
+            error: function() {
+
+
+              alert("發生錯誤，請稍後再試。");
+
+
+            }
+
+
+          });
+
+
+        });
+
+
+      });
+
+
+    </script>
+
+
+  </body>
+
+
+</html>

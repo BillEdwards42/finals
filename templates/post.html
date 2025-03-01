@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <title>{% if post.title %}{{ post.title }}{% else %}Post #{{ post.id }}{% endif %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar">
+      <a href="{{ url_for('home') }}" class="logo">ccu.never</a>
+      <div class="nav-links">
+        {% if session['user_id'] %}
+          <span>您好, {{ session['username'] }}</span>
+          <a href="{{ url_for('logout') }}">登出</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">登入</a>
+          <a href="{{ url_for('register') }}">註冊</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="post-detail-container">
+      <div class="post-detail-card">
+        <!-- Post Header -->
+        <div class="post-detail-header">
+          <div class="post-header-top">
+            <div class="post-rating-time">
+              <div class="post-rating">
+                <i class="fas fa-star"></i> <span>{{ post.rating }}</span>
+              </div>
+              <div class="post-time">{{ post.time_since }}</div>
+            </div>
+          </div>
+          
+          <h1>{% if post.title %}{{ post.title }}{% else %}Post #{{ post.id }}{% endif %}</h1>
+          
+          <div class="post-meta">
+            <div class="like-section">
+              {% if session['user_id'] %}
+                <button 
+                  class="heart-button {% if user_liked_post %}liked{% endif %}" 
+                  data-post-id="{{ post.id }}"
+                  aria-label="Like post">
+                  <i class="fa-heart {% if user_liked_post %}fas{% else %}far{% endif %}"></i>
+                </button>
+              {% else %}
+                <i class="far fa-heart"></i>
+              {% endif %}
+              <span class="like-count" id="post-likes-{{ post.id }}">{{ post.likes }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Post Content -->
+        <div class="post-detail-content">
+          <p>{{ post.content }}</p>
+        </div>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section">
+        <h2>評論 ({{ comments|length }})</h2>
+        
+        <!-- Add Comment Form -->
+        {% if session['user_id'] %}
+        <div class="add-comment-form">
+          <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+            <textarea name="comment" placeholder="添加評論..." required></textarea>
+            <button type="submit">發佈</button>
+          </form>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+          <p>您必須<a href="{{ url_for('login') }}">登入</a>才能發表評論</p>
+        </div>
+        {% endif %}
+        
+        <!-- Comments List -->
+        {% if comments %}
+          <div class="comments-list">
+            {% for comment in comments %}
+              <div class="comment-card">
+                <div class="comment-content">
+                  <p>{{ comment.content }}</p>
+                </div>
+                <div class="comment-footer">
+                  <div class="like-section">
+                    {% if session['user_id'] %}
+                      <button 
+                        class="heart-button comment-heart {% if user_liked_comments[comment.id] %}liked{% endif %}" 
+                        data-comment-id="{{ comment.id }}"
+                        data-post-id="{{ post.id }}"
+                        aria-label="Like comment">
+                        <i class="fa-heart {% if user_liked_comments[comment.id] %}fas{% else %}far{% endif %}"></i>
+                      </button>
+                    {% else %}
+                      <i class="far fa-heart"></i>
+                    {% endif %}
+                    <span class="like-count" id="comment-likes-{{ comment.id }}">{{ comment.likes }}</span>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="no-comments">
+            <p>目前沒有評論，成為第一個評論的人！</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="back-link">
+        <a href="{{ url_for('show_establishment', est_id=post.establishment_id) }}" class="btn-back">
+          ← 返回列表
+        </a>
+      </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+      <p>© 2025 ccu.never. All rights reserved.</p>
+    </footer>
+
+    <!-- ========== SCRIPT: Heart Animation ========== -->
+    <script>
+      $(document).ready(function() {
+        // Like Post (Heart animation)
+        $('.heart-button').not('.comment-heart').on('click', function() {
+          const button = $(this);
+          const postId = button.data('post-id');
+          const likeCountElement = $(`#post-likes-${postId}`);
+          
+          // Send AJAX request to like/unlike post
+          $.ajax({
+            url: `/post/${postId}/like`,
+            type: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+              if (response.status === 'success') {
+                // Update heart icon and like count
+                if (response.liked) {
+                  button.addClass('liked');
+                  button.find('i').removeClass('far').addClass('fas');
+                  
+                  // Add heart burst animation
+                  button.append('<span class="heart-burst-animation"></span>');
+                  setTimeout(function() {
+                    button.find('.heart-burst-animation').remove();
+                  }, 1000);
+                } else {
+                  button.removeClass('liked');
+                  button.find('i').removeClass('fas').addClass('far');
+                }
+                
+                likeCountElement.text(response.likes);
+              } else {
+                alert(response.message);
+              }
+            }
+          });
+        });
+        
+        // Like Comment
+        $('.comment-heart').on('click', function() {
+          const button = $(this);
+          const commentId = button.data('comment-id');
+          const postId = button.data('post-id');
+          const likeCountElement = $(`#comment-likes-${commentId}`);
+          
+          // Send AJAX request to like/unlike comment
+          $.ajax({
+            url: `/post/${postId}/comment/${commentId}/like`,
+            type: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+              if (response.status === 'success') {
+                // Update heart icon and like count
+                if (response.liked) {
+                  button.addClass('liked');
+                  button.find('i').removeClass('far').addClass('fas');
+                  
+                  // Add heart burst animation
+                  button.append('<span class="heart-burst-animation"></span>');
+                  setTimeout(function() {
+                    button.find('.heart-burst-animation').remove();
+                  }, 1000);
+                } else {
+                  button.removeClass('liked');
+                  button.find('i').removeClass('fas').addClass('far');
+                }
+                
+                likeCountElement.text(response.likes);
+              } else {
+                alert(response.message);
+              }
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

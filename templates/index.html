@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <title>ccu.never - 首頁</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar">
+      <!-- Logo on the left, linking to home -->
+      <a href="{{ url_for('home') }}" class="logo">ccu.never</a>
+
+      <!-- Right side nav links: check user session for login/logout -->
+      <div class="nav-links">
+        {% if session['user_id'] %}
+          <!-- If logged in, show username and logout -->
+          <span>您好, {{ session['username'] }}</span>
+          <a href="{{ url_for('logout') }}">登出</a>
+        {% else %}
+          <!-- If not logged in, show login/register -->
+          <a href="{{ url_for('login') }}">登入</a>
+          <a href="{{ url_for('register') }}">註冊</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- ========== GRADIENT HERO SECTION ========== -->
+    <section class="gradient-hero">
+      <div class="hero-content">
+        <h1 class="hero-title">發現最真實的體驗與評價</h1>
+        <p class="hero-subtitle">在 ccu.never 分享您的心得，連接同學、同事與朋友</p>
+        <div class="hero-actions">
+          <a href="{{ url_for('list_establishments') }}" class="hero-button primary">
+            <i class="fas fa-store"></i> 瀏覽店家
+          </a>
+          {% if not session['user_id'] %}
+          <a href="{{ url_for('register') }}" class="hero-button secondary">
+            <i class="fas fa-user-plus"></i> 立即加入
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURES SECTION ========== -->
+    <section class="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <h3>誠實評價</h3>
+        <p>來自真實用戶的評分和評論，幫助您做出更好的選擇</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-comment-dots"></i>
+        </div>
+        <h3>分享經驗</h3>
+        <p>分享您的體驗和建議，協助他人了解不同店家</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3>社群連結</h3>
+        <p>與周圍的人建立聯繫，發現共同喜好的地方</p>
+      </div>
+    </section>
+
+    <!-- ========== CTA SECTION ========== -->
+    <section class="cta-section">
+      <h2>準備好開始分享您的體驗嗎？</h2>
+      <a href="{{ url_for('list_establishments') }}" class="cta-button">查看店家列表</a>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+      <p>© 2025 ccu.never. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

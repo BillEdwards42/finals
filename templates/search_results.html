@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <title>Search Results - {{ query }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar">
+      <a href="{{ url_for('home') }}" class="logo">ccu.later</a>
+      <div class="nav-links">
+        {% if session['user_id'] %}
+          <span>您好, {{ session['username'] }}</span>
+          <a href="{{ url_for('logout') }}">登出</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">登入</a>
+          <a href="{{ url_for('register') }}">註冊</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="search-results">
+        <h1>Search Results for "{{ query }}"</h1>
+        
+        {% if establishments %}
+          <div class="establishments-grid">
+            {% for est in establishments %}
+              <div class="establishment-card">
+                <a href="{{ url_for('show_establishment', est_id=est.id) }}">
+                  <h2>{{ est.name }}</h2>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="no-results">No establishments found matching "{{ query }}"</p>
+        {% endif %}
+        
+        <div class="search-again">
+          <form action="{{ url_for('search_establishments') }}" method="GET">
+            <input type="text" name="query" placeholder="Search establishments..." value="{{ query }}">
+            <button type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="back-link">
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+      </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+      <p>© 2025 ccu.later. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

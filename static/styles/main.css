@@ -1,0 +1,1667 @@
+/*
+  main.css
+
+  Combines:
+  1) A sticky navbar at the top.
+  2) A main container that splits into left content (.left-content) 
+     and a diagonal image container (.right-image) for desktops/tablets.
+  3) The diagonal image container is hidden on mobile.
+  4) The semi-transparent .intro-section on the left (with a button to 
+     reveal .establishment-list, etc.).
+  5) A footer.
+  6) Responsive behavior for various screen sizes.
+*/
+
+/* 1. Reset & Basic Styling */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  color: #333;
+}
+
+/* Light pineapple-yellow background for the full page */
+body {
+  background-color: #FFFDE7;
+  min-height: 100vh;
+  overflow-y: scroll;
+}
+
+body::-webkit-scrollbar {
+  width: 0;               /* Hide scrollbar but maintain functionality */
+  background: transparent; 
+}
+
+/* 2. Custom Properties (Optional) */
+:root {
+  --color-primary: #FFC107;   /* Pineapple yellow for headings/buttons */
+  --color-secondary: #4CAF50; /* Leafy green for navbar, etc. */
+  --color-bg: #F5F5F5;        /* Neutral container background if needed */
+  --color-accent: #FF5722;    /* Orange/red accent if needed */
+  --color-text-dark: #333;    
+  --color-text-light: #fff;  
+  --navbar-height: 56px;     /* Navbar height variable */
+  --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --card-radius: 12px;
+  --heart-color: #ff2d55;
+}
+
+/* 3. Sticky Navbar at Top */
+.navbar {
+  position: sticky; 
+  top: 0;
+  width: 100%;
+  z-index: 999; /* Above other content */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-secondary); /* Leafy green */
+  padding: 0.75rem 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  height: var(--navbar-height);
+}
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-text-light);
+  text-decoration: none;
+}
+.navbar .nav-links a,
+.navbar .nav-links span {
+  color: var(--color-text-light);
+  text-decoration: none;
+  margin-left: 1rem;
+  font-weight: 600;
+}
+.navbar .nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* 4. Main Layout: 
+   A container that splits horizontally into .left-content and .right-image
+   on larger screens.
+*/
+.main-container {
+  display: flex; 
+  min-height: calc(100vh - var(--navbar-height)); /* Fill viewport minus navbar */
+  position: relative;
+}
+
+/* ----- LEFT SIDE CONTENT ----- */
+.left-content {
+  flex: 0 0 50%; /* always 50% of .main-container */
+  display: flex;
+  align-items: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* The semi-transparent block for text/intro, 
+   like your original .intro-section. */
+.intro-section {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  padding: 2rem;
+  width: 580px;
+  text-align: left;
+}
+.intro-section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: var(--color-primary);
+}
+.intro-section p {
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+/* Button to reveal establishment list */
+.show-establishments-btn {
+  background: var(--color-secondary);
+  color: var(--color-text-light);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.show-establishments-btn:hover {
+  background: #388E3C;
+  transform: translateY(-2px);
+}
+.show-establishments-btn:active {
+  transform: translateY(0);
+}
+
+/* The establishment list (hidden by default, toggled via JS). */
+.establishment-list {
+  margin-top: 2rem;
+  max-width: 600px;
+  display: none; 
+}
+.establishment-list h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+.establishment-list ul {
+  list-style: none;
+  padding: 0;
+}
+.establishment-list li {
+  margin-bottom: 0.75rem;
+  background: #EEEEEE;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.establishment-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.establishment-list li a.establishment-link {
+  text-decoration: none;
+  color: var(--color-secondary);
+  font-weight: 600;
+  display: block;
+}
+.establishment-list li a.establishment-link:hover {
+  color: #388E3C;
+}
+
+/* ----- RIGHT SIDE DIAGONAL IMAGE ----- */
+.right-image {
+  flex: 1;
+  position: relative;
+  overflow: hidden; /* Hide clipped portion of the image */
+  margin-left: -10%; /* SHIFT it left, so it overlaps the left-content's area */
+  z-index: 0;
+  padding: 10px 10px 10px 0; /* Add padding on top, right, and bottom */
+  height: calc(100vh - var(--navbar-height)); /* Make image fill viewport minus navbar */
+}
+
+/* The diagonal clipping for the image.
+   E.g., top-right corner => bottom-right corner => bottom-middle. */
+.right-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center; /* Center the image */
+  display: block;
+  clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
+  border-radius: 0 8px 8px 0; /* Rounded corners on right side */
+}
+
+/* 5. FOOTER */
+footer {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 0; /* The footer will show below the main container when scrolling */
+}
+
+/* 6. Establishment Page Styles */
+.establishment-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.establishment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.establishment-header h1 {
+  color: var(--color-secondary);
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+.post-search {
+  display: flex;
+  align-items: center;
+}
+
+.post-search input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 1rem;
+  width: 250px;
+}
+
+.post-search button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.posts-container {
+  display: grid;
+  gap: 2rem;
+}
+
+.create-post-card {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.create-post-card h2 {
+  color: var(--color-secondary);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.post-title-input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.post-content-input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.post-submit-btn {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  align-self: flex-end;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.post-submit-btn:hover {
+  background: #388E3C;
+  transform: translateY(-2px);
+}
+
+.login-prompt {
+  background: #f8f9fa;
+  border-radius: var(--card-radius);
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-prompt a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
+}
+
+.posts-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.post-card {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 1.5rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.post-title {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-secondary);
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.like-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.like-count i {
+  color: var(--heart-color);
+}
+
+.post-content {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.post-footer {
+  text-align: right;
+}
+
+.read-more-btn {
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s;
+}
+
+.read-more-btn:hover {
+  color: #388E3C;
+}
+
+.no-posts {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: #f8f9fa;
+  border-radius: var(--card-radius);
+}
+
+.back-link {
+  margin-top: 2rem;
+}
+
+.btn-back {
+  color: var(--color-text-dark);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s;
+}
+
+.btn-back:hover {
+  color: var(--color-secondary);
+}
+
+/* 7. Post Detail Page Styles */
+.post-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.post-detail-card {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.post-detail-header {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.post-detail-header h1 {
+  color: var(--color-secondary);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.post-detail-content {
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.comments-section {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.comments-section h2 {
+  color: var(--color-secondary);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.75rem;
+}
+
+.add-comment-form {
+  margin-bottom: 2rem;
+}
+
+.add-comment-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 80px;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.add-comment-form button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  float: right;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.add-comment-form button:hover {
+  background: #388E3C;
+  transform: translateY(-2px);
+}
+
+.comments-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.comment-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.comment-content {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.comment-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #777;
+}
+
+/* Heart Button and Animation */
+.heart-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--heart-color);
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+}
+
+.heart-button:hover {
+  transform: scale(1.1);
+}
+
+.heart-button.liked {
+  color: var(--heart-color);
+}
+
+.heart-button i {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.heart-burst-animation {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,45,85,0.2) 0%, rgba(255,45,85,0) 70%);
+  border-radius: 50%;
+  transform: scale(0);
+  animation: heartBurst 1s ease-out forwards;
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* 8. Auth Pages Styles */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height) - 60px);
+  padding: 2rem;
+}
+
+.auth-card {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.auth-header h1 {
+  color: var(--color-secondary);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: var(--color-secondary);
+  outline: none;
+}
+
+.auth-button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.auth-button:hover {
+  background: #388E3C;
+  transform: translateY(-2px);
+}
+
+.auth-footer {
+  margin-top: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.auth-footer a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* 9. Search Results Page Styles */
+.search-results {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.search-results h1 {
+  color: var(--color-secondary);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.75rem;
+}
+
+.establishments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.establishment-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.establishment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.establishment-card a {
+  text-decoration: none;
+}
+
+.establishment-card h2 {
+  color: var(--color-secondary);
+  margin: 0;
+  font-size: 1.3rem;
+  transition: color 0.3s;
+}
+
+.establishment-card a:hover h2 {
+  color: #388E3C;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #777;
+}
+
+.search-again {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.search-again form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-again input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.search-again button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.search-again button:hover {
+  background: #388E3C;
+}
+
+/* 10. RESPONSIVE BEHAVIOR */
+
+/* On mobile screens below 768px, hide the diagonal image and 
+   let the left content take full width. */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column; /* Stack top to bottom */
+    min-height: auto; /* Allow content to determine height on mobile */
+  }
+
+  .right-image {
+    display: none; 
+  }
+  
+  .left-content {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  /* If you want the .intro-section to be narrower or centered, do so: */
+  .intro-section {
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .establishment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .post-search {
+    width: 100%;
+  }
+  
+  .post-search input {
+    width: 100%;
+  }
+  
+  .auth-container {
+    padding: 1rem;
+  }
+  
+  .auth-card {
+    padding: 1.5rem;
+  }
+}
+
+/* On even smaller screens (below 480px), 
+   further adjust spacing/font sizes if needed. */
+@media (max-width: 480px) {
+  .intro-section h2 {
+    font-size: 1.5rem;
+  }
+  .left-content {
+    padding: 1rem;
+  }
+  
+  .post-detail-container,
+  .establishment-container {
+    padding: 1rem;
+  }
+  
+  .post-detail-card,
+  .comments-section,
+  .create-post-card {
+    padding: 1.25rem;
+  }
+  
+  .post-detail-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .post-card {
+    padding: 1rem;
+  }
+  
+  .auth-card {
+    padding: 1.25rem;
+  }
+}
+/* 11. New Styles for Establishments Page */
+.establishments-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.establishments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.establishments-header h1 {
+  color: var(--color-secondary);
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+.search-container {
+  margin-left: auto;
+}
+
+.search-input-container {
+  display: flex;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-input-container input {
+  border: 1px solid #ddd;
+  border-right: none;
+  padding: 0.75rem 1.5rem;
+  width: 300px;
+  border-radius: 30px 0 0 30px;
+  font-size: 1rem;
+}
+
+.search-input-container input:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+}
+
+.search-button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  border-radius: 0 30px 30px 0;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background: #388E3C;
+}
+
+.establishments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.establishment-card {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.establishment-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.establishment-card h2 {
+  color: var(--color-secondary);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.est-desc {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-secondary);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  align-self: flex-end;
+}
+
+.view-btn:hover {
+  background: #388E3C;
+  transform: translateY(-2px);
+}
+
+.no-establishments {
+  text-align: center;
+  padding: 3rem;
+  background: #f8f9fa;
+  border-radius: var(--card-radius);
+  margin-bottom: 2rem;
+}
+
+.no-establishments p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.reset-search {
+  display: inline-block;
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.reset-search:hover {
+  background: var(--color-secondary);
+  color: white;
+}
+
+/* 12. Auth Error Message Styles */
+.auth-error-message, .auth-flash-message {
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-error-message {
+  background: #ffebee;
+  color: #d32f2f;
+  border-left: 4px solid #d32f2f;
+}
+
+.flash-error {
+  background: #ffebee;
+  color: #d32f2f;
+  border-left: 4px solid #d32f2f;
+}
+
+.flash-success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-left: 4px solid #2e7d32;
+}
+
+.input-error {
+  border-color: #d32f2f \!important;
+  background-color: #ffebee \!important;
+}
+
+/* 13. Show Establishments Button */
+.show-establishments-btn {
+  display: inline-block;
+  background: var(--color-secondary);
+  color: var(--color-text-light);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.show-establishments-btn:hover {
+  background: #388E3C;
+  transform: translateY(-2px);
+  color: var(--color-text-light);
+}
+
+.show-establishments-btn:active {
+  transform: translateY(0);
+}
+
+/* 14. New Index Page Styles */
+.hero {
+  position: relative;
+  height: 70vh;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero-content {
+  flex: 0 0 50%;
+  padding: 4rem;
+  position: relative;
+  z-index: 2;
+  color: var(--color-text-dark);
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: var(--color-secondary);
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+  max-width: 80%;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.hero-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.hero-button.primary {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.hero-button.secondary {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+}
+
+.hero-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.hero-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--color-secondary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+}
+
+.feature-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: var(--color-secondary);
+}
+
+.feature-card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.cta-section {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #2E7D32 100%);
+  padding: 4rem 2rem;
+  text-align: center;
+  color: white;
+  margin-top: 3rem;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.cta-button {
+  display: inline-block;
+  background: white;
+  color: var(--color-secondary);
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.cta-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 15. Floating Button and Modal Styles */
+.floating-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: none;
+  cursor: pointer;
+  z-index: 990;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.floating-button:hover {
+  transform: translateY(-5px) scale(1.05);
+  background: #2E7D32;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  padding: 2rem;
+  transform: translateY(20px);
+  transition: transform 0.3s;
+}
+
+.modal.show .modal-content {
+  transform: translateY(0);
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+
+.modal h2 {
+  color: var(--color-secondary);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+#post-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+#post-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+#post-form input,
+#post-form textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+#post-form textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+#post-form button {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  float: right;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#post-form button:hover {
+  background: #2E7D32;
+  transform: translateY(-2px);
+}
+
+/* Star Rating System */
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stars {
+  display: flex;
+  font-size: 1.5rem;
+  color: #FFD700;
+}
+
+.star {
+  cursor: pointer;
+  padding: 0 2px;
+  position: relative;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: #555;
+  min-width: 1.5rem;
+}
+
+/* Login Required Modal */
+.login-required-message {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.login-required-message i {
+  font-size: 3rem;
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+}
+
+.login-required-message h2 {
+  margin: 0.5rem 0;
+}
+
+.login-required-message p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-btn {
+  padding: 0.8rem 2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.modal-btn.primary {
+  background: var(--color-secondary);
+  color: white;
+}
+
+.modal-btn.secondary {
+  background: white;
+  color: var(--color-secondary);
+  border: 1px solid var(--color-secondary);
+}
+
+.modal-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* 16. Post Card Redesign */
+.post-card {
+  position: relative;
+  padding: 1.5rem;
+  cursor: pointer;
+}
+
+.post-meta-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.post-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.post-rating i {
+  color: #FFD700; /* Star color */
+}
+
+.post-time {
+  color: #888;
+}
+
+.post-title {
+  font-size: 1.4rem;
+  margin: 0.5rem 0 0.8rem;
+  color: var(--color-secondary);
+}
+
+.post-preview {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.post-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.post-likes, .post-comments {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.post-likes i {
+  color: var(--heart-color);
+}
+
+.post-comments i {
+  color: var(--color-secondary);
+}
+
+/* 17. Post Detail Page Enhancement */
+.post-header-top {
+  margin-bottom: 0.5rem;
+}
+
+.post-rating-time {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    flex-direction: column;
+  }
+  
+  .hero-content {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-actions {
+    justify-content: center;
+  }
+  
+  .hero-image {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  
+  .hero-image img {
+    clip-path: none;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Fix for double error messages in login/register */
+.auth-flash-message {
+  display: none; /* Hide the second error message */
+}
+/* 18. Gradient Hero Styles */
+.gradient-hero {
+  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+  padding: 4rem 2rem;
+  text-align: center;
+  color: white;
+  border-radius: 0 0 50% 50% / 20%;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.gradient-hero::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  pointer-events: none;
+}
+
+.gradient-hero .hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  padding: 0;
+}
+
+.gradient-hero .hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: white;
+  line-height: 1.2;
+}
+
+.gradient-hero .hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.9;
+}
+
+.gradient-hero .hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.gradient-hero .hero-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gradient-hero .hero-button.primary {
+  background-color: white;
+  color: var(--color-secondary);
+}
+
+.gradient-hero .hero-button.secondary {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.gradient-hero .hero-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .gradient-hero {
+    padding: 3rem 1.5rem;
+    border-radius: 0 0 25% 25% / 10%;
+  }
+  
+  .gradient-hero .hero-title {
+    font-size: 2.2rem;
+  }
+  
+  .gradient-hero .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .gradient-hero .hero-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

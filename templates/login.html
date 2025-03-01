@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <title>登入 - ccu.never</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar">
+      <a href="{{ url_for('home') }}" class="logo">ccu.never</a>
+      <div class="nav-links">
+        <a href="{{ url_for('register') }}">註冊</a>
+      </div>
+    </nav>
+
+    <div class="auth-container">
+      <div class="auth-card">
+        <!-- Display error messages if any -->
+        {% if error %}
+          <div class="auth-error-message {% if error == 'email_not_found' %}error-email{% elif error == 'invalid_password' %}error-password{% endif %}">
+            {% if error == 'email_not_found' %}
+              <i class="fas fa-exclamation-circle"></i> 錯誤：此電子郵件尚未註冊
+            {% elif error == 'invalid_password' %}
+              <i class="fas fa-exclamation-circle"></i> 錯誤：密碼不正確
+            {% endif %}
+          </div>
+        {% endif %}
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="auth-flash-message {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        <div class="auth-header">
+          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ccu.never Logo" class="auth-logo">
+          <h1>登入您的帳戶</h1>
+        </div>
+        
+        <form method="POST" class="auth-form">
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> 電子郵件</label>
+            <input type="email" id="email" name="email" required {% if error == 'email_not_found' %}class="input-error"{% endif %}>
+          </div>
+          
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> 密碼</label>
+            <input type="password" id="password" name="password" required {% if error == 'invalid_password' %}class="input-error"{% endif %}>
+          </div>
+          
+          <button type="submit" class="auth-button">登入</button>
+        </form>
+        
+        <div class="auth-footer">
+          <p>還沒有帳戶？ <a href="{{ url_for('register') }}">立即註冊</a></p>
+          <p><a href="{{ url_for('home') }}">← 返回首頁</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+      <p>© 2025 ccu.never. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

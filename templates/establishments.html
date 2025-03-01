@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <title>所有店家 - ccu.never</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar">
+      <a href="{{ url_for('home') }}" class="logo">ccu.never</a>
+      <div class="nav-links">
+        {% if session['user_id'] %}
+          <span>您好, {{ session['username'] }}</span>
+          <a href="{{ url_for('logout') }}">登出</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">登入</a>
+          <a href="{{ url_for('register') }}">註冊</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="establishments-page">
+      <div class="establishments-header">
+        <h1>店家列表</h1>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+          <form action="{{ url_for('list_establishments') }}" method="GET">
+            <div class="search-input-container">
+              <input type="text" name="search" placeholder="搜尋店家..." value="{{ search_query }}">
+              <button type="submit" class="search-button">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      {% if establishments %}
+        <div class="establishments-grid">
+          {% for est in establishments %}
+            <div class="establishment-card">
+              <div class="card-content">
+                <h2>{{ est.name }}</h2>
+                <p class="est-desc">查看評論和分享您的體驗</p>
+                <a href="{{ url_for('show_establishment', est_id=est.id) }}" class="view-btn">
+                  查看評論 <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="no-establishments">
+          <p>沒有找到符合條件的店家</p>
+          {% if search_query %}
+            <a href="{{ url_for('list_establishments') }}" class="reset-search">顯示所有店家</a>
+          {% endif %}
+        </div>
+      {% endif %}
+      
+      <div class="back-link">
+        <a href="{{ url_for('home') }}">
+          <i class="fas fa-arrow-left"></i> 返回首頁
+        </a>
+      </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <footer>
+      <p>© 2025 ccu.never. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
